@@ -1,0 +1,82 @@
+apply plugin: "java-library"
+apply plugin: "io.spinnaker.plugin.service-extension"
+apply plugin: "maven-publish"
+apply plugin: "kotlin"
+apply plugin: "kotlin-kapt"
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+repositories {
+    gradlePluginPortal()
+    jcenter()
+    google()
+    mavenCentral()
+    mavenLocal()
+}
+
+spinnakerPlugin {
+    serviceName = "igor"
+    pluginClass = "com.amazon.spinnaker.igor.ci.CiBuildPlugin"
+    requires="igor>=v4.4.0"
+    description = 'Plugin to enable CiBuilds in Igor.'
+    version = rootProject.version
+}
+
+dependencies {
+    implementation("com.squareup.retrofit:retrofit:1.9.0")
+    implementation("com.squareup.retrofit:converter-jackson:1.9.0")
+
+    compileOnly(group: 'org.pf4j', name: 'pf4j', version: "${pf4jVersion}")
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}"
+    compileOnly (group: 'com.netflix.spinnaker.kork', name: 'kork-plugins-api', version: "${korkVersion}")
+    compileOnly (group: 'com.netflix.spinnaker.kork', name: 'kork-web', version: "${korkVersion}")
+    compileOnly (group: 'com.netflix.spinnaker.kork', name: 'kork-plugins-spring-api', version: "${korkVersion}")
+    compileOnly (group: 'org.springframework', name: 'spring-context', version: '5.2.1.RELEASE')
+    compileOnly (group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.12.1')
+    compileOnly (group: 'com.netflix.spinnaker.igor', name: 'igor-web', version: "unspecified")
+    compileOnly (group: 'com.netflix.spinnaker.igor', name: 'igor-core', version: "unspecified")
+    compileOnly ("io.github.resilience4j:resilience4j-retry:1.7.0")
+    compileOnly ("io.github.resilience4j:resilience4j-circuitbreaker:1.7.0")
+    compileOnly ("com.fasterxml.jackson:jackson-base:2.12.1")
+    implementation ("com.jakewharton.retrofit:retrofit1-okhttp3-client:1.1.0")
+    implementation("org.netbeans.external:org-apache-commons-io:RELEASE113")
+    implementation("io.github.microutils:kotlin-logging:1.12.0")
+
+    implementation "com.fasterxml.jackson.core:jackson-annotations"
+    implementation "com.fasterxml.jackson.core:jackson-core"
+    implementation "com.fasterxml.jackson.core:jackson-databind"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.12.1"
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.1")
+
+    kapt(group: 'org.pf4j', name: 'pf4j', version: "${pf4jVersion}")
+
+    testImplementation ("org.junit.jupiter:junit-jupiter-api:5.5.2")
+    testImplementation (group: 'io.strikt', name: 'strikt-core', version: '0.22.1')
+    testImplementation (group: 'dev.minutest', name: 'minutest', version: '1.10.0')
+    testImplementation (group: 'io.mockk', name: 'mockk', version: '1.9.3')
+    testImplementation("dev.minutest:minutest")
+
+    testRuntime ("org.junit.jupiter:junit-jupiter-engine:5.4.0")
+    testRuntime ("org.junit.platform:junit-platform-commons:1.5.2")
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
+}
+
+compileKotlin {
+    kotlinOptions {
+        languageVersion = "1.4"
+        jvmTarget = targetCompatibility
+        freeCompilerArgs = ['-Xjvm-default=enable']
+    }
+}
+
+compileTestKotlin {
+    kotlinOptions {
+        languageVersion = "1.4"
+        jvmTarget = targetCompatibility
+        freeCompilerArgs = ['-Xjvm-default=enable']
+    }
+}
