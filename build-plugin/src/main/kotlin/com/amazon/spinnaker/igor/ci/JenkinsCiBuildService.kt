@@ -53,13 +53,13 @@ import java.util.regex.Pattern;
 import javax.net.ssl.*
 
 class JenkinsCiBuildService(
-        val jenkinsProperties: JenkinsProperties,
-        val dockerRegistryAccounts:DockerRegistryAccounts,
-        val circuitBreakerRegistry:CircuitBreakerRegistry,
-        val scmMasters:List<AbstractScmMaster>,
-        val jenkinsOkHttpClientProvider:JenkinsOkHttpClientProvider,
-        val jenkinsRetrofitRequestInterceptorProvider:JenkinsRetrofitRequestInterceptorProvider,
-        val registry: Registry,
+        private val jenkinsProperties: JenkinsProperties,
+        private val dockerRegistryAccounts:DockerRegistryAccounts,
+        private val circuitBreakerRegistry:CircuitBreakerRegistry,
+        private val scmMasters:List<AbstractScmMaster>,
+        private val jenkinsOkHttpClientProvider:JenkinsOkHttpClientProvider,
+        private val jenkinsRetrofitRequestInterceptorProvider:JenkinsRetrofitRequestInterceptorProvider,
+        private val registry: Registry,
 ) : CiBuildService {
 
     private val logger = KotlinLogging.logger {}
