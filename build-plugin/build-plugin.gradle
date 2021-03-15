@@ -52,10 +52,15 @@ dependencies {
     kapt(group: 'org.pf4j', name: 'pf4j', version: "${pf4jVersion}")
 
     testImplementation ("org.junit.jupiter:junit-jupiter-api:5.5.2")
-    testImplementation (group: 'io.strikt', name: 'strikt-core', version: '0.22.1')
+    testImplementation (group: 'io.strikt', name: 'strikt-core', version: '0.29.0')
     testImplementation (group: 'dev.minutest', name: 'minutest', version: '1.10.0')
     testImplementation (group: 'io.mockk', name: 'mockk', version: '1.9.3')
-    testImplementation("dev.minutest:minutest")
+    testImplementation ("dev.minutest:minutest")
+    testImplementation (group: 'com.netflix.spinnaker.igor', name: 'igor-web', version: "unspecified")
+    testImplementation ("io.github.resilience4j:resilience4j-retry:1.7.0")
+    testImplementation ("io.github.resilience4j:resilience4j-circuitbreaker:1.7.0")
+    testImplementation ("org.codehaus.groovy:groovy-all:3.0.7")
+    testImplementation (group: 'com.netflix.spinnaker.igor', name: 'igor-core', version: "unspecified")
 
     testRuntime ("org.junit.jupiter:junit-jupiter-engine:5.4.0")
     testRuntime ("org.junit.platform:junit-platform-commons:1.5.2")
