@@ -136,6 +136,7 @@ class JenkinsCiBuildService(
     val revs = getGitDetails(jobName, buildNumber)?.genericGitRevisions()?: emptyList<GenericGitRevision>();
     val properties = mutableMapOf<String, String>()
     val artifacts = mutableListOf<GenericArtifact>()
+    val updatedRevs = mutableListOf<GenericGitRevision>()
 
     val p = Pattern.compile(".+/(.+)/(.+).git")
     revs.forEach { grv ->
@@ -144,13 +145,18 @@ class JenkinsCiBuildService(
         val commit = try {
             this.scmMaster.getCommitDetails(m.group(1), m.group(2), grv.getSha1()) as Commit
         } catch (e: Exception) {
+            updatedRevs.add(grv)
+            logger.error(e.message)
             return@forEach
         }
         properties.put("projectKey", m.group(1))
         properties.put("repoSlug", m.group(2))
-        grv.withAuthorInfo(commit.getAuthor().getName(), commit.getMessage()).withTimestamp(
-            commit.getAuthor().getDate()
-        ).withCompareUrl(commit.html_url)
+        updatedRevs.add(grv
+                .withCommitter(commit.getAuthor().getName())
+                .withMessage(commit.getMessage())
+                .withTimestamp(commit.getAuthor().getDate())
+                .withCompareUrl(commit.html_url)
+        )
 
         // pull artifact details based on the buildNumber and commit sha1 in its metadata
         getArtifact(images, jobName, buildNumber, commit.getSha())?.let {
@@ -160,7 +166,7 @@ class JenkinsCiBuildService(
     }
 
    return callBuild(jobName, buildNumber).genericBuild(jobName)
-       .withGitInfo(revs).withProperties(properties).withArtifacts(artifacts);
+       .withGenericGitRevisions(updatedRevs).withProperties(properties).withArtifacts(artifacts);
   }
 
 
@@ -209,13 +215,9 @@ class JenkinsCiBuildService(
   private fun getArtifact(images: List<TaggedImage>, jobName: String, buildNumber: Int, commitId: String): GenericArtifact? {
     images.forEach { im ->
       if (im.buildNumber == buildNumber.toString() && im.commitId == commitId) {
-        return@getArtifact GenericArtifact("docker", im.repository, im.tag, im.digest).withUrl(
-            String.format(
-                "https://%s/v2/%s/blobs/%s",
-                im.registry,
-                im.repository,
-                im.digest
-            ))
+        val url = String.format("https://%s/v2/%s/blobs/%s", im.registry, im.repository, im.digest)
+        return@getArtifact GenericArtifact("docker", im.repository, im.tag, im.digest)
+                .withUrl(url).withDisplayPath(url)
       }
     }
 

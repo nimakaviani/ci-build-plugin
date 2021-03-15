@@ -167,6 +167,8 @@ internal class JenkinsCiBuildServiceTest : JUnit5Minutests {
                 val buildData = b.first()
                 expectThat(buildData) {
                     get { id }.isEqualTo("some-project-4")
+                    get { properties.get("projectKey") as String }.isEqualTo("test")
+                    get { properties.get("repoSlug") as String }.isEqualTo("repo")
                     get { result }.isEqualTo(Result.SUCCESS)
                     get { genericGitRevisions.size }.isEqualTo(1)
                     get { artifacts }.get { size }.isEqualTo(1)
