@@ -143,8 +143,6 @@ class JenkinsCiBuildService(
       val m = p.matcher(grv.remoteUrl);
       if (m.find()) {
         val commit = try {
-            logger.info(m.group(4))
-            logger.info(m.group(5))
             this.scmMaster.getCommitDetails(m.group(4), m.group(5).removeSuffix(".git"), grv.getSha1()) as Commit
         } catch (e: Exception) {
             updatedRevs.add(grv)
