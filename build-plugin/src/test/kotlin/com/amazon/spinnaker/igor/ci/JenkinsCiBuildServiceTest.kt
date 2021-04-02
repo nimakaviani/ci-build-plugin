@@ -156,7 +156,7 @@ internal class JenkinsCiBuildServiceTest : JUnit5Minutests {
                 )
                 coEvery { jenkinsClient.getGitDetails(any(),any()) } returns getScmDetails(a)
                 coEvery { jenkinsClient.getBuilds(any())} returns getBuildList()
-                coEvery { jenkinsClient.getBuild("some-project", 4)} returns getBuildsResult()
+                coEvery { jenkinsClient.getBuild("some-slug", 4)} returns getBuildsResult()
                 coEvery { mockScmMaster.getCommitDetails("test", "repo", any()) } returns getCommitDetails()
             }
 
@@ -166,7 +166,7 @@ internal class JenkinsCiBuildServiceTest : JUnit5Minutests {
 
                 val buildData = b.first()
                 expectThat(buildData) {
-                    get { id }.isEqualTo("some-project-4")
+                    get { id }.isEqualTo("some-slug-4")
                     get { properties.get("projectKey") as String }.isEqualTo("test")
                     get { properties.get("repoSlug") as String }.isEqualTo("repo")
                     get { result }.isEqualTo(Result.SUCCESS)
