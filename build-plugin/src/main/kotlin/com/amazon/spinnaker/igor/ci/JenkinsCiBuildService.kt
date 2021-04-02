@@ -138,19 +138,21 @@ class JenkinsCiBuildService(
     val artifacts = mutableListOf<GenericArtifact>()
     val updatedRevs = mutableListOf<GenericGitRevision>()
 
-    val p = Pattern.compile(".+/(.+)/(.+).git")
+    val p = Pattern.compile("^(\\w+://|\\w+@|)(.+?)(:|/)(.+?)/(.+)")
     revs.forEach { grv ->
       val m = p.matcher(grv.remoteUrl);
       if (m.find()) {
         val commit = try {
-            this.scmMaster.getCommitDetails(m.group(1), m.group(2), grv.getSha1()) as Commit
+            logger.info(m.group(4))
+            logger.info(m.group(5))
+            this.scmMaster.getCommitDetails(m.group(4), m.group(5).removeSuffix(".git"), grv.getSha1()) as Commit
         } catch (e: Exception) {
             updatedRevs.add(grv)
             logger.error(e.message)
             return@forEach
         }
-        properties.put("projectKey", m.group(1))
-        properties.put("repoSlug", m.group(2))
+        properties.put("projectKey", m.group(4))
+        properties.put("repoSlug", m.group(5).removeSuffix(".git"))
         updatedRevs.add(grv
                 .withCommitter(commit.getAuthor().getName())
                 .withMessage(commit.getMessage())
@@ -164,7 +166,6 @@ class JenkinsCiBuildService(
         }
       }
     }
-
    return callBuild(jobName, buildNumber).genericBuild(jobName)
        .withGenericGitRevisions(updatedRevs).withProperties(properties).withArtifacts(artifacts);
   }
