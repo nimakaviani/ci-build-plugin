@@ -89,8 +89,8 @@ class JenkinsCiBuildService(
       commitId: String?,
       completionStatus: String?
   ) : List<GenericBuild>{
-    // projectKey is supposed to match the Jenkins job name
-    var jobName = projectKey
+    // repoSlug is supposed to match the Jenkins job name
+    var jobName = repoSlug
     val imageArtifacts = getImages()
 
     buildNumber?.let { bn ->
@@ -103,7 +103,7 @@ class JenkinsCiBuildService(
     }
 
     val genericBuilds = mutableListOf<GenericBuild>();
-    callBuilds(projectKey).stream().forEach{ b -> genericBuilds.add(
+    callBuilds(jobName).stream().forEach{ b -> genericBuilds.add(
         getGenericBuildWithGitDetails(
             jobName,
             b.getNumber(),
