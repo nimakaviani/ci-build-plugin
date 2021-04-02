@@ -185,6 +185,29 @@ internal class JenkinsCiBuildServiceTest : JUnit5Minutests {
                  }
             }
 
+            context("when git url does not end with .git") {
+                before {
+                    val repoName1 = getAction("https://github.com/test1/repo1", getBuild(getRevision(getBranch("some-branch", "some-sha1"))))
+                    val repoName2 = getAction("git@github.com:test2/repo2", getBuild(getRevision(getBranch("some-branch", "some-sha1"))))
+                    coEvery { jenkinsClient.getGitDetails(any(),any()) } returnsMany listOf(getScmDetails(repoName1), getScmDetails(repoName2))
+                    coEvery { mockScmMaster.getCommitDetails(any(), any(), any()) } returns getCommitDetails()
+                }
+
+                test("correct projectKey and repoSlug values are returned") {
+                    val b  = buildService.getBuilds("some-project", "some-slug", null, null, null)
+                    val c = buildService.getBuilds("some-project", "some-slug", null, null, null)
+                    expectThat(b.size).equals(1)
+                    expectThat(b.first()) {
+                        get { properties.get("projectKey") as String }.isEqualTo("test1")
+                        get { properties.get("repoSlug") as String }.isEqualTo("repo1")
+                    }
+                    expectThat(c.first()) {
+                        get { properties.get("projectKey") as String }.isEqualTo("test2")
+                        get { properties.get("repoSlug") as String }.isEqualTo("repo2")
+                    }
+                }
+            }
+
             context("when no github action is available for build") {
                 before {
                     coEvery { jenkinsClient.getGitDetails(any(), any()) } returns getScmDetails(null)
