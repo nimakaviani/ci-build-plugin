@@ -5,8 +5,8 @@
 If your Spinnaker release is 1.25.2 or older, you need to update the following components to 
 have the respective commits:
 
-- Clouddriver: spinnaker/clouddriver@f900ea6
-- Igor: spinnaker/igor@074d9aa
+- Clouddriver: [spinnaker/clouddriver@f900ea6](https://github.com/spinnaker/clouddriver/commit/f900ea67c97c1be3476488c6fb497cfa7e9e8ca7)
+- Igor: [spinnaker/igor@074d9aa](https://github.com/spinnaker/igor/commit/074d9aa805d20443631de4712603e0b8298ac5ec)
 
 You also need to have one (and currently only one) Jenkins installation enaled for use with the plugin.
 The Jenkins deployment needs to be accessible to Spinnaker.
