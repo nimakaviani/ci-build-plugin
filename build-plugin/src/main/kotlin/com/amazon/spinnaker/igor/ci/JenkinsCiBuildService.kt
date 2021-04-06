@@ -97,8 +97,7 @@ class JenkinsCiBuildService(
       imageArtifacts.forEach { i ->
           i.artifact?.let {
               val labels = (it["metadata"] as Map<String, Map<String, String>>)["labels"] as Map<String, String>
-              if (repoSlug.isNullOrBlank() && projectKey.isNullOrBlank()
-                  && buildNumber == labels["buildNumber"] && commitId == (labels["commitId"])) {
+              if (buildNumber == labels["buildNumber"] && commitId == labels["commitId"]) {
                   logger.info("found matching image with buildNumber {} and commitId {}", buildNumber, commitId)
                   labels["jobName"]?.let { name ->
                       jobName = name
@@ -108,13 +107,12 @@ class JenkinsCiBuildService(
               }
           }
       }
-        return if (!jobName.isNullOrBlank()) {
-            logger.info("getting git details with jobName {} and buildNumber {}", jobName, bn)
-            listOf(getGenericBuildWithGitDetails(jobName!!, Integer.parseInt(bn), imageArtifacts));
-        } else {
-            logger.debug("could not find a valid jobName from images")
-            genericBuilds
-        }
+
+      jobName?.let {
+          logger.info("getting git details with jobName {} and buildNumber {}", jobName, bn)
+          return listOf(getGenericBuildWithGitDetails(jobName!!, Integer.parseInt(bn), imageArtifacts))
+      }
+      return genericBuilds
     }
 
     jobName?.let {
