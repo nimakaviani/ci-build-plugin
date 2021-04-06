@@ -11,6 +11,8 @@ have the respective commits:
 You also need to have one (and currently only one) Jenkins installation enaled for use with the plugin.
 The Jenkins deployment needs to be accessible to Spinnaker.
 
+Refer to [this documentation](/docs/examples/jenkins) for an example of Jenkins installation and configuration.
+
 ## Configuration
 
 ### Deck
