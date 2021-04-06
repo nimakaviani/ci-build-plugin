@@ -112,7 +112,7 @@ class JenkinsCiBuildService(
             logger.debug("getting git details with jobName {} and buildNumber {}", jobName, bn)
             listOf(getGenericBuildWithGitDetails(jobName!!, Integer.parseInt(bn), imageArtifacts));
         } else {
-            emptyList()
+            genericBuilds
         }
     }
 
@@ -125,7 +125,7 @@ class JenkinsCiBuildService(
             )
         )}
     }
-    return genericBuilds;
+    return genericBuilds
   }
 
   override fun getBuildOutput(buildId: String) : Map<String, Any> {
