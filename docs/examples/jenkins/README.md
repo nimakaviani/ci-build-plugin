@@ -10,7 +10,7 @@ This is an example Jenkins deployment which creates:
 
 ### Jenkins setup steps:
 
-1. Create a Jenkins instance by `kubectl -n jenkins apply -f jenkinsDeployment.yaml`
+1. Create a Jenkins instance by running `kubectl -n jenkins apply -f jenkinsDeployment.yaml`
 2. Connect to your Jenkins instance, login, and install `Dcoker pipeline`, `Docker Commons`, and `Kubernetes` plugins in addition to default plugins.
 3. Create a job. The name must match the application name in Spinnaker.
 4. Create a GitHub repository. Copy `index.html`, `Dockerfile`, and `Jenkinsfile` to the root of the newly created repository.
