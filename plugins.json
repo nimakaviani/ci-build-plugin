@@ -1,0 +1,17 @@
+[
+  {
+    "id": "aws.CiBuildPlugin",
+    "description": "Add Ci Support to Igor",
+    "provider": "https://aws.amazon.com",
+    "releases": [
+      {
+        "version": "0.0.1",
+        "date": "2021-04-06T22:24:28.081723Z",
+        "requires": "igor>=v4.4.0",
+        "sha512sum": "ffea2650e73a58a545a605b5da2b35a9fc96b5474a91bc55155a2a001b1c6009608cb5410a7d7293264c806836ed332998f0b1965a42b41e17701ed0f2d44809",
+        "preferred": false,
+        "url": "https://github.com/nimakaviani/ci-build-plugin/releases/download/0.0.1/ci-build-plugin-0.0.1.zip"
+      }
+    ]
+  }
+]
