@@ -83,8 +83,8 @@ class JenkinsCiBuildService(
     }
 
   override fun getBuilds(
-      projectKey: String,
-      repoSlug: String,
+      projectKey: String?,
+      repoSlug: String?,
       buildNumber: String?,
       commitId: String?,
       completionStatus: String?
@@ -92,25 +92,39 @@ class JenkinsCiBuildService(
     // repoSlug is supposed to match the Jenkins job name
     var jobName = repoSlug
     val imageArtifacts = getImages()
-
+    val genericBuilds = mutableListOf<GenericBuild>();
     buildNumber?.let { bn ->
       imageArtifacts.forEach { i ->
-          jobName = (i.artifact["metadata"] as Map<String?, Map<String?, String>>)["labels"]?.get("jobName") as String
-          return@forEach
+          i.artifact?.let {
+              val labels = (it["metadata"] as Map<String, Map<String, String>>)["labels"] as Map<String, String>
+              if (repoSlug.isNullOrBlank() && projectKey.isNullOrBlank()
+                  && buildNumber == labels["buildNumber"] && commitId == (labels["commitId"])) {
+                  logger.debug("found matching image with buildNumber {} and commitId {}", buildNumber, commitId)
+                  labels["jobName"]?.let { name ->
+                      jobName = name
+                  }
+                  logger.debug("labels: {}", labels)
+                  return@forEach
+              }
+          }
       }
-
-      return listOf(getGenericBuildWithGitDetails(jobName, Integer.parseInt(bn), imageArtifacts));
+        return if (!jobName.isNullOrBlank()) {
+            logger.debug("getting git details with jobName {} and buildNumber {}", jobName, bn)
+            listOf(getGenericBuildWithGitDetails(jobName!!, Integer.parseInt(bn), imageArtifacts));
+        } else {
+            emptyList()
+        }
     }
 
-    val genericBuilds = mutableListOf<GenericBuild>();
-    callBuilds(jobName).stream().forEach{ b -> genericBuilds.add(
-        getGenericBuildWithGitDetails(
-            jobName,
-            b.getNumber(),
-            imageArtifacts
-        )
-    )
-    };
+    jobName?.let {
+        callBuilds(it).stream().forEach{ b -> genericBuilds.add(
+            getGenericBuildWithGitDetails(
+                it,
+                b.number,
+                imageArtifacts
+            )
+        )}
+    }
     return genericBuilds;
   }
 
