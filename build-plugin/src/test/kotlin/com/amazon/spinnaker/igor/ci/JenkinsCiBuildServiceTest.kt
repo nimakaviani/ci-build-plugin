@@ -245,6 +245,44 @@ internal class JenkinsCiBuildServiceTest : JUnit5Minutests {
                     }.isFailure()
                 }
             }
+
+            context("when only buildNumber and commitId are provided") {
+                before {
+                    val image1 = taggedImage("", "", "", "")
+                    val image2 = taggedImage("", "", "", "")
+                    val image3 = taggedImage("", "", "", "")
+                    val labels = mapOf("buildNumber" to "10", "commitId" to "some-commit-1", "jobName" to "some-job-name")
+                    image1.artifact = mapOf("metadata" to mapOf("labels" to labels))
+                    coEvery { clouddriverService.getImagesByAccount("something", true) } returns listOf(
+                        image1, image2, image3
+                    )
+                    coEvery { jenkinsClient.getBuild("some-job-name", 10) } returns getBuildsResult()
+                    coEvery {
+                        jenkinsClient.getGitDetails(
+                            "some-job-name",
+                            10
+                        )
+                    } returns getScmDetails(
+                        getAction(
+                            "github.com/test/repo.git",
+                            getBuild(getRevision(getBranch("some-branch", "some-sha1")))
+                        )
+                    )
+                }
+
+                test("a build is returned") {
+                    val output = buildService.getBuilds(null, null, "10", "some-commit-1", null)
+                    expectThat(output).hasSize(1)
+                }
+                test("no build is returned for incorrect commitID") {
+                    val output = buildService.getBuilds(null, null, "11", "some-commit-2", null)
+                    expectThat(output).hasSize(0)
+                }
+                test("no build is returned for incorrect buildNumber") {
+                    val output = buildService.getBuilds(null, null, "11", "some-commit-1", null)
+                    expectThat(output).hasSize(0)
+                }
+            }
         }
 
         context("when fetching build output") {

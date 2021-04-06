@@ -83,8 +83,8 @@ class JenkinsCiBuildService(
     }
 
   override fun getBuilds(
-      projectKey: String,
-      repoSlug: String,
+      projectKey: String?,
+      repoSlug: String?,
       buildNumber: String?,
       commitId: String?,
       completionStatus: String?
@@ -92,26 +92,39 @@ class JenkinsCiBuildService(
     // repoSlug is supposed to match the Jenkins job name
     var jobName = repoSlug
     val imageArtifacts = getImages()
-
+    val genericBuilds = mutableListOf<GenericBuild>();
     buildNumber?.let { bn ->
       imageArtifacts.forEach { i ->
-          jobName = (i.artifact["metadata"] as Map<String?, Map<String?, String>>)["labels"]?.get("jobName") as String
-          return@forEach
+          i.artifact?.let {
+              val labels = (it["metadata"] as Map<String, Map<String, String>>)["labels"] as Map<String, String>
+              if (buildNumber == labels["buildNumber"] && commitId == labels["commitId"]) {
+                  logger.info("found matching image with buildNumber {} and commitId {}", buildNumber, commitId)
+                  labels["jobName"]?.let { name ->
+                      jobName = name
+                  }
+                  logger.debug("labels: {}", labels)
+                  return@forEach
+              }
+          }
       }
 
-      return listOf(getGenericBuildWithGitDetails(jobName, Integer.parseInt(bn), imageArtifacts));
+      jobName?.let {
+          logger.info("getting git details with jobName {} and buildNumber {}", jobName, bn)
+          return listOf(getGenericBuildWithGitDetails(jobName!!, Integer.parseInt(bn), imageArtifacts))
+      }
+      return genericBuilds
     }
 
-    val genericBuilds = mutableListOf<GenericBuild>();
-    callBuilds(jobName).stream().forEach{ b -> genericBuilds.add(
-        getGenericBuildWithGitDetails(
-            jobName,
-            b.getNumber(),
-            imageArtifacts
-        )
-    )
-    };
-    return genericBuilds;
+    jobName?.let {
+        callBuilds(it).stream().forEach{ b -> genericBuilds.add(
+            getGenericBuildWithGitDetails(
+                it,
+                b.number,
+                imageArtifacts
+            )
+        )}
+    }
+    return genericBuilds
   }
 
   override fun getBuildOutput(buildId: String) : Map<String, Any> {
