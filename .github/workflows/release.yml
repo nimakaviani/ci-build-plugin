@@ -38,7 +38,12 @@ jobs:
         run: ./gradlew test
 
       - name: build
-        run: if ! [[ -z ${VERSION:?} ]]; then echo "Building release version ${VERSION}"; fi && ./gradlew -Pversion=$VERSION releaseBundle && ls -la ./build/distributions
+        run: |
+          VERSION_FROM_STEP=${{steps.get_project_info.outputs.VERSION}}
+          echo ${VERSION_FROM_STEP}
+          if ! [[ -z ${VERSION_FROM_STEP:?} ]]; then echo "Building release version ${VERSION_FROM_STEP}"; fi && ./gradlew -Pversion=${VERSION_FROM_STEP} releaseBundle && ls -la ./build/distributions
+          git describe --tags --always --first-parent
+          git status
 
       - name: create release
         id: create_release
