@@ -257,7 +257,6 @@ internal class JenkinsCiBuildServiceTest : JUnit5Minutests {
                         image1, image2, image3
                     )
                     coEvery { jenkinsClient.getBuild("some-job-name", 10) } returns getBuildsResult()
-//                    coEvery { jenkinsClient.getBuild("some-job-name", 11) } returns
                     coEvery {
                         jenkinsClient.getGitDetails(
                             "some-job-name",
