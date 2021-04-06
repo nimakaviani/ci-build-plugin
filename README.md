@@ -56,13 +56,16 @@ Also, in your `igor.yml` file, enable the plugin:
 
 ```yaml
 spinnaker:
-  extensibility:
-    plugins-root-path: /tmp/plugins
-    plugins:
-      aws.CiBuildPlugin:
-        enabled: true
-    repositories: {}
-    strict-plugin-loading: false
+    extensibility:
+      plugins-root-path: /opt/igor/plugins
+      plugins:
+        aws.CiBuildPlugin:
+          enabled: true
+          version: <<plugin release version>>
+      repositories:
+        awsCiBuildPluginRepo:
+          id: awsCiBuildPluginRepo
+          url: https://raw.githubusercontent.com/nimakaviani/ci-build-plugin/main/plugins.json
 ```
 
 ### Clouddriver
@@ -120,7 +123,20 @@ docker build \
 ### Build Locally
 run `./gradlew build -x test && ./gradlew releaseBundle` and copy the created zip file to
 `/tmp/plugins` or your plugin folder of choice. Make sure that the folder is
-writable for the plugin to be unzipped in.
+writable for the plugin to be unzipped in. You can then add the following
+snippet to your `igor.yml` file and test the plugin locally.
+
+
+```yaml
+spinnaker:
+  extensibility:
+    plugins-root-path: /tmp/plugins
+    plugins:
+      aws.CiBuildPlugin:
+        enabled: true
+    repositories: {}
+    strict-plugin-loading: false
+```
 
 ### Test Releases
 Under the `hack/` folder, you will find a script that allows you to create a 
