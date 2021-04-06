@@ -84,6 +84,7 @@ metadata:
   labels:
     kubernetes.io/bootstrapping: rbac-defaults
   name: jenkins
+  namespace: jenkins
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
